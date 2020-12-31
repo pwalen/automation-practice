@@ -3,18 +3,22 @@ from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.support.select import  Select
+from selenium.webdriver.support.select import Select
 from selenium.common.exceptions import *
 import random
 import string
+from csv import writer
 from time import sleep
+
 
 # Random characters generators
 def random_characters(y):
-    return ''.join(random.choice(string.ascii_letters) for x in range(y))
+    return ''.join(random.choice(string.ascii_letters) for _x in range(y))
+
 
 def random_hexdigits(y):
-    return ''.join(random.choice(string.hexdigits) for x in range(y))
+    return ''.join(random.choice(string.hexdigits) for _x in range(y))
+
 
 driver = webdriver.Chrome()
 url = 'http://automationpractice.com/index.php'
@@ -100,17 +104,37 @@ WebDriverWait(driver, 10).until(EC.visibility_of_any_elements_located((By.ID, 'u
 # actions = ActionChains(driver)
 # actions.move_to_element(dropdown_years_list).perform()
 
-# Select a year in range (1930-2002)
-year_of_birth = random.randint(19, 90)
-dropdown_years.select_by_index(year_of_birth)
+# Select a year in range (1930-2002) by index
+index_year = random.randint(19, 90)
+dropdown_years.select_by_index(index_year)
+
 
 # Create a dictionary from two lists - indexes and years:
-keys_list = list(range(19, 91))
-values_list = list(range(2002, 1930, -1))
-zip_iterator = zip(keys_list, values_list)
-year_dictionary = dict(zip_iterator)
+def get_year_by_index(value):
+    keys_list = list(range(19, 91))
+    values_list = list(range(2002, 1930, -1))
+    zip_iterator = zip(keys_list, values_list)
+    year_dictionary = dict(zip_iterator)
+    return year_dictionary[value]
 
-print(f'Day of birth: {day_of_birth}-{month_of_birth}-{year_dictionary[year_of_birth]}')
+year_of_birth = get_year_by_index(index_year)
+
+date_of_birth = f'{day_of_birth}-{month_of_birth}-{year_of_birth}'
+
+print(date_of_birth)
+
+user_data = [proper_email, password, firstname, lastname, date_of_birth]
+
+# Append user_data as a new row to an existing user_data.csv file
+with open('user_data.csv', 'a') as ud:
+    writer_ud = writer(ud)
+    writer_ud.writerow(user_data)
+    ud.close()
+
+# Print out user_data
+print(f'\nUSER DATA:\nemail: {user_data[0]}\npassword: {user_data[1]}\nfirstname: {user_data[2]}\nlastname: {user_data[3]}\ndate of birth: {user_data[4]}')
+
+
 
 sleep(3)
 driver.close()
